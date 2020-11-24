@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 
 app.listen(PORT, () => {
-    console.log(`API server now on ${PORT} 3001!`);
+    console.log(`API server now on ${PORT}!`);
 });
 
 
@@ -48,7 +48,6 @@ app.get('/api/animals', (req, res) => {
     let results = animals;
     if (req.query) {
         console.log("Req query: ", req.query);
-        console.log(typeof req.query);
         results = filterByQuery(req.query, results);
     }
     res.json(results);
