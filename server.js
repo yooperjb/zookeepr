@@ -3,10 +3,6 @@ const {animals} = require('./data/animals.json');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-app.listen(PORT, () => {
-    console.log(`API server now on ${PORT}!`);
-});
-
 
 function filterByQuery(query, animalsArray) {
     let personalityTraitsArray = [];
@@ -41,6 +37,12 @@ function filterByQuery(query, animalsArray) {
     return filteredResults;
 };
 
+// get a specific animal by id
+function findById(id, animalsArray) {
+    const result = animalsArray.filter(animal => animal.id === id)[0];
+    return result;
+};
+
 // get method requires two arguments. 1. string that describes the route to fetch from. 2. callback function that executes every time that routed is accessed with a GET request. 
 app.get('/api/animals', (req, res) => {
     // res is short for response - send for short, json for sending json files.
@@ -51,4 +53,18 @@ app.get('/api/animals', (req, res) => {
         results = filterByQuery(req.query, results);
     }
     res.json(results);
+});
+
+// new GET route for animals
+app.get('/api/animals/:id', (req, res) => {
+    const result = findById(req.params.id, animals);
+    if (result) {
+        res.json(result);
+    } else {
+        res.send(404);
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`API server now on ${PORT}!`);
 });
