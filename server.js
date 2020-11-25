@@ -1,8 +1,14 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const {animals} = require('./data/animals.json');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+// parse incoming string or array data
+app.use(express.urlencoded({ extended: true }));
+// parse incoming JSON data
+app.use(express.json());
 
 function filterByQuery(query, animalsArray) {
     let personalityTraitsArray = [];
@@ -43,6 +49,20 @@ function findById(id, animalsArray) {
     return result;
 };
 
+function createNewAnimal(body, animalsArray) {
+    
+    const animal = body;
+    
+    // add animal to animalsArray
+    animalsArray.push(animal);
+    fs.writeFileSync(
+        path.join(__dirname, './data/animals.json'),
+        JSON.stringify({animals: animalsArray}, null, 2)
+    );
+        
+    return animal;
+}
+
 // get method requires two arguments. 1. string that describes the route to fetch from. 2. callback function that executes every time that routed is accessed with a GET request. 
 app.get('/api/animals', (req, res) => {
     // res is short for response - send for short, json for sending json files.
@@ -64,6 +84,18 @@ app.get('/api/animals/:id', (req, res) => {
         res.send(404);
     }
 });
+
+// app post route
+app.post('/api/animals', (req, res) => {
+    // set id based on what the next index of the array will be
+    req.body.id = animals.length.toString();
+
+    // add animal to json file and animals array in this function
+    const animal = createNewAnimal(req.body, animals);
+
+    res.json(animal);
+});
+
 
 app.listen(PORT, () => {
     console.log(`API server now on ${PORT}!`);
